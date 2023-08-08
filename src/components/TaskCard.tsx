@@ -82,8 +82,8 @@ export function TaskCard({ task, deleteTask, updateTask }: TaskCardProps) {
   // When not dragging and not in edit mode, we want to show the actual task card
   if (!isDragging && !editMode) {
     return (
-      <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="bg-mainBackgroundColor p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl hover:ring-2 hover:ring-inset hover:ring-rose-500 cursor-grab relative task" onClick={toggleEditMode} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-        <p className="my-auto h-[90%] w-full p-1 overflow-y-auto overflow-x-hidden whitespace-pre-wrap">
+      <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="bg-mainBackgroundColor p-2.5 mx-1 h-[100px] min-h-[100px] items-center flex text-left rounded-xl hover:ring-2 hover:ring-inset hover:ring-rose-500 cursor-grab relative task" onClick={toggleEditMode} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <p className="my-auto h-[90%] w-[100%] p-1 overflow-y-auto overflow-x-hidden whitespace-pre-wrap">
           {task.content}
         </p>
         

@@ -72,14 +72,14 @@ export function ColumnContainer({ column, deleteColumn, updateColumn, tasks, cre
         </div>
 
         {/* Column task container */}
-        <div className="flex flex-col flex-grow gap-4 p-2 overflow-x-hidden overflow-y-auto">
+        <div className="flex flex-col flex-grow gap-4 p-2 overflow-x-hidden overflow-y-auto rounded-xl">
           <SortableContext items={tasksIds}>
             {tasks.map((task) => <TaskCard key={task.id} task={task} deleteTask={deleteTask} updateTask={updateTask}/>)}
           </SortableContext>
         </div>
 
         {/* Column footer */}
-        <button onClick={() => createTask(column.id)} className="flex items-center gap-2 p-4 border-2 rounded-md border-columnBackgroundColor border-x-columnBackgroundColor hover:bg-mainBackgroundColor hover:text-rose-500 active:bg-black">
+        <button onClick={() => createTask(column.id)} className="flex items-center gap-2 p-4 m-2 border-2 rounded-xl border-columnBackgroundColor border-x-columnBackgroundColor hover:bg-zinc-950 hover:text-rose-500 active:bg-black">
           <PlusIcon />
           <span>Add task</span>
         </button>
