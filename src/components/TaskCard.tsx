@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Id, Task, TaskCardProps } from "../types";
+import { TaskCardProps } from "../types";
 import TrashIcon from "../icons/TrashIcon";
 
 function TaskCard({ task, deleteTask, updateTask }: TaskCardProps) {
@@ -35,22 +35,21 @@ function TaskCard({ task, deleteTask, updateTask }: TaskCardProps) {
 
   // Event handlers
 
-  const handleKeyDown = (e) => {
-    if (e.shiftKey && e.key === "Enter") {
+  const handleKeyDown = (e: { shiftKey: boolean; key: string; }) => {
+    if (e.shiftKey === true && e.key === "Enter") {
       toggleEditMode();
     }
   };
 
-  const handleTextChange = (e) => {
-    const newTextValue = e.target.value;
-    updateTask(task.id, newTextValue)
+  const handleTextChange = (e: { target: { value: string; }; }) => {
+    updateTask(task.id, e.target.value)
   };
 
-  const handleMouseEnter = (e) => {
+  const handleMouseEnter = () => {
     setMouseIsOver(true)
   };
 
-  const handleMouseLeave = (e) => {
+  const handleMouseLeave = () => {
     setMouseIsOver(false)
   };
 
