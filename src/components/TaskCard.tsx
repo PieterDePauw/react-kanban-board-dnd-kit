@@ -4,7 +4,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { TaskCardProps } from "../types";
 import TrashIcon from "../icons/TrashIcon";
 
-function TaskCard({ task, deleteTask, updateTask }: TaskCardProps) {
+export function TaskCard({ task, deleteTask, updateTask }: TaskCardProps) {
   const [mouseIsOver, setMouseIsOver] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
@@ -26,17 +26,17 @@ function TaskCard({ task, deleteTask, updateTask }: TaskCardProps) {
     transform: CSS.Transform.toString(transform),
   };
 
-  // Helper functions
+  // + Helper functions +
   
   const toggleEditMode = () => {
-    setEditMode((prev) => !prev);
     setMouseIsOver(false);
+    setEditMode((prev) => !prev);
   };
 
-  // Event handlers
+  // + Event handlers +
 
   const handleKeyDown = (e: { shiftKey: boolean; key: string; }) => {
-    if (e.shiftKey === true && e.key === "Enter") {
+    if (e.key === "Enter" && e.shiftKey) {
       toggleEditMode();
     }
   };
@@ -53,7 +53,8 @@ function TaskCard({ task, deleteTask, updateTask }: TaskCardProps) {
     setMouseIsOver(false)
   };
 
-  // Render logic
+  // + Render logic +
+
   // When dragging, we want to show a placeholder element instead of the actual task card
   if (isDragging) {
     return (
@@ -66,10 +67,10 @@ function TaskCard({ task, deleteTask, updateTask }: TaskCardProps) {
     return (
       <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="bg-mainBackgroundColor p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl hover:ring-2 hover:ring-inset hover:ring-rose-500 cursor-grab relative">
         <textarea
-          className="h-[90%] w-full resize-none border-none rounded bg-transparent text-white focus:outline-none"
           value={task.content}
-          autoFocus
           placeholder="Add the task content here..."
+          className="h-[90%] w-[100%] p-1 resize-none border-none rounded bg-transparent text-white focus:outline-none"
+          autoFocus={true}
           onBlur={toggleEditMode}
           onKeyDown={handleKeyDown}
           onChange={handleTextChange}
@@ -82,7 +83,7 @@ function TaskCard({ task, deleteTask, updateTask }: TaskCardProps) {
   if (!isDragging && !editMode) {
     return (
       <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="bg-mainBackgroundColor p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl hover:ring-2 hover:ring-inset hover:ring-rose-500 cursor-grab relative task" onClick={toggleEditMode} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-        <p className="my-auto h-[90%] w-full overflow-y-auto overflow-x-hidden whitespace-pre-wrap">
+        <p className="my-auto h-[90%] w-full p-1 overflow-y-auto overflow-x-hidden whitespace-pre-wrap">
           {task.content}
         </p>
         

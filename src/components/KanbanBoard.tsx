@@ -1,209 +1,59 @@
-import PlusIcon from "../icons/PlusIcon";
+// Import NPM packages
 import { useMemo, useState } from "react";
-import { Column, Id, Task } from "../types";
-import ColumnContainer from "./ColumnContainer";
-import {
-  DndContext,
-  DragEndEvent,
-  DragOverEvent,
-  DragOverlay,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
-import TaskCard from "./TaskCard";
+import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 
-const defaultCols: Column[] = [
-  {
-    id: "todo",
-    title: "Todo",
-  },
-  {
-    id: "doing",
-    title: "Work in progress",
-  },
-  {
-    id: "done",
-    title: "Done",
-  },
-];
+// Import components, data, hooks, and types from other files
+import { ColumnContainer } from "./ColumnContainer";
+import { TaskCard } from "./TaskCard";
+import { PlusIcon } from "../icons";
+import { Column, Id, Task } from "../types";
+import { defaultColumnsData, defaultTasksData } from "../data";
 
-const defaultTasks: Task[] = [
-  {
-    id: "1",
-    columnId: "todo",
-    content: "List admin APIs for dashboard",
-  },
-  {
-    id: "2",
-    columnId: "todo",
-    content:
-      "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
-  },
-  {
-    id: "3",
-    columnId: "doing",
-    content: "Conduct security testing",
-  },
-  {
-    id: "4",
-    columnId: "doing",
-    content: "Analyze competitors",
-  },
-  {
-    id: "5",
-    columnId: "done",
-    content: "Create UI kit documentation",
-  },
-  {
-    id: "6",
-    columnId: "done",
-    content: "Dev meeting",
-  },
-  {
-    id: "7",
-    columnId: "done",
-    content: "Deliver dashboard prototype",
-  },
-  {
-    id: "8",
-    columnId: "todo",
-    content: "Optimize application performance",
-  },
-  {
-    id: "9",
-    columnId: "todo",
-    content: "Implement data validation",
-  },
-  {
-    id: "10",
-    columnId: "todo",
-    content: "Design database schema",
-  },
-  {
-    id: "11",
-    columnId: "todo",
-    content: "Integrate SSL web certificates into workflow",
-  },
-  {
-    id: "12",
-    columnId: "doing",
-    content: "Implement error logging and monitoring",
-  },
-  {
-    id: "13",
-    columnId: "doing",
-    content: "Design and implement responsive UI",
-  },
-];
+// Import the default columns and tasks from the data file
+const defaultCols: Column[] = defaultColumnsData;
+const defaultTasks: Task[] = defaultTasksData;
 
 function KanbanBoard() {
   const [columns, setColumns] = useState<Column[]>(defaultCols);
+  const [tasks, setTasks] = useState<Task[]>(defaultTasks);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
-  const [tasks, setTasks] = useState<Task[]>(defaultTasks);
-
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
-
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 10,
-      },
-    })
-  );
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 10 } }) );
 
   return (
-    <div
-      className="
-        m-auto
-        flex
-        min-h-screen
-        w-full
-        items-center
-        overflow-x-auto
-        overflow-y-hidden
-        px-[40px]
-    "
-    >
-      <DndContext
-        sensors={sensors}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        onDragOver={onDragOver}
-      >
-        <div className="m-auto flex gap-4">
+    <div className="m-auto flex min-h-screen w-full items-center overflow-x-auto overflow-y-hidden px-[40px]">
+      <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver}>
+        <div className="flex gap-4 m-auto">
           <div className="flex gap-4">
             <SortableContext items={columnsId}>
               {columns.map((col) => (
-                <ColumnContainer
-                  key={col.id}
-                  column={col}
-                  deleteColumn={deleteColumn}
-                  updateColumn={updateColumn}
-                  createTask={createTask}
-                  deleteTask={deleteTask}
-                  updateTask={updateTask}
-                  tasks={tasks.filter((task) => task.columnId === col.id)}
-                />
+                <ColumnContainer key={col.id} column={col} tasks={tasks.filter((task) => task.columnId === col.id)} deleteColumn={deleteColumn} updateColumn={updateColumn} createTask={createTask} deleteTask={deleteTask} updateTask={updateTask} />
               ))}
             </SortableContext>
           </div>
-          <button
-            onClick={() => {
-              createNewColumn();
-            }}
-            className="
-      h-[60px]
-      w-[350px]
-      min-w-[350px]
-      cursor-pointer
-      rounded-lg
-      bg-mainBackgroundColor
-      border-2
-      border-columnBackgroundColor
-      p-4
-      ring-rose-500
-      hover:ring-2
-      flex
-      gap-2
-      "
-          >
+          <button onClick={() => createNewColumn()} className="h-[60px] w-[350px] min-w-[350px] cursor-pointer rounded-lg bg-mainBackgroundColor border-2 border-columnBackgroundColor p-4 ring-rose-500 hover:ring-2 flex gap-2">
             <PlusIcon />
-            Add Column
+            <span>Add Column</span>
           </button>
         </div>
 
         {createPortal(
           <DragOverlay>
             {activeColumn && (
-              <ColumnContainer
-                column={activeColumn}
-                deleteColumn={deleteColumn}
-                updateColumn={updateColumn}
-                createTask={createTask}
-                deleteTask={deleteTask}
-                updateTask={updateTask}
-                tasks={tasks.filter(
-                  (task) => task.columnId === activeColumn.id
-                )}
-              />
+              <ColumnContainer column={activeColumn} tasks={tasks.filter((task) => task.columnId === activeColumn.id)} deleteColumn={deleteColumn} updateColumn={updateColumn} createTask={createTask} deleteTask={deleteTask} updateTask={updateTask} />
             )}
             {activeTask && (
-              <TaskCard
-                task={activeTask}
-                deleteTask={deleteTask}
-                updateTask={updateTask}
-              />
+              <TaskCard task={activeTask} deleteTask={deleteTask} updateTask={updateTask} />
             )}
           </DragOverlay>,
           document.body
         )}
+
       </DndContext>
     </div>
   );
@@ -259,76 +109,92 @@ function KanbanBoard() {
   }
 
   function onDragStart(event: DragStartEvent) {
-    if (event.active.data.current?.type === "Column") {
-      setActiveColumn(event.active.data.current.column);
+    // Get the active item (the item that is being dragged)
+    const { active } = event;
+
+    // If the active item (the item that is being dragged) is a column, set the active column state
+    if (active.data.current?.type === "Column") {
+      setActiveColumn(active.data.current.column as Column);
       return;
     }
 
-    if (event.active.data.current?.type === "Task") {
-      setActiveTask(event.active.data.current.task);
+    // If the active item (the item that is being dragged) is a task, set the active task state
+    if (active.data.current?.type === "Task") {
+      setActiveTask(active.data.current.task as Task);
       return;
     }
   }
 
-  function onDragEnd(event: DragEndEvent) {
-    setActiveColumn(null);
-    setActiveTask(null);
-
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeId = active.id;
-    const overId = over.id;
-
-    if (activeId === overId) return;
-
-    setColumns((columns) => {
-      const activeColumnIndex = columns.findIndex((col) => col.id === activeId);
-
-      const overColumnIndex = columns.findIndex((col) => col.id === overId);
-
-      return arrayMove(columns, activeColumnIndex, overColumnIndex);
-    });
-  }
 
   function onDragOver(event: DragOverEvent) {
+    // Get the active item (the item that is being dragged) and the over item (the item that it is being dragged over)
     const { active, over } = event;
+
+    // If there is no over item (the item that the active item is being dragged over) is not present, do nothing
     if (!over) return;
 
-    const activeId = active.id;
-    const overId = over.id;
+    // If both the active item (the item that is being dragged) as well as the over item (the item that it is being dragged over) have the same ID, there has been no position change, so do nothing
+    if (active.id === over.id) return;
 
-    if (activeId === overId) return;
-
+    // Check the type of both the active item (the item that is being dragged) as wemll as the over item (the item that it is being dragged over)
     const isActiveATask = active.data.current?.type === "Task";
     const isOverATask = over.data.current?.type === "Task";
+    const isOverAColumn = over.data.current?.type === "Column";
 
+    // If the active item (the item that is being dragged) is not a task, do nothing
     if (!isActiveATask) return;
 
-    // Im dropping a Task over another Task
+    // If the active item (the item that is being dragged) and the over item (the item that it is being dragged over) are both tasks, use the over 
     if (isActiveATask && isOverATask) {
       setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
-        const overIndex = tasks.findIndex((t) => t.id === overId);
-
+        // Find the index of the active task (the task that is being dragged) by finding the index of the task with the same ID as the active task
+        const activeIndex = tasks.findIndex((task) => task.id === active.id);
+        // Find the index of the over task (the task that it is being dragged over) by finding the index of the task with the same ID as the over task
+        const overIndex = tasks.findIndex((task) => task.id === over.id);
+        // Update the column ID of the active task to the column ID of the over task
         tasks[activeIndex].columnId = tasks[overIndex].columnId;
-
+        // Move the active task to the index of the over task
         return arrayMove(tasks, activeIndex, overIndex);
       });
     }
 
-    const isOverAColumn = over.data.current?.type === "Column";
-
-    // Im dropping a Task over a column
+    // If the active item (the item that is being dragged) is a task and the over item (the item that it is being dragged over) is a column, ... 
     if (isActiveATask && isOverAColumn) {
       setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
-
-        tasks[activeIndex].columnId = overId;
-
+        // Find the index of the active task (the task that is being dragged) by finding the index of the task with the same ID as the active task
+        const activeIndex = tasks.findIndex((task) => task.id === active.id);
+        // Update the column ID of the active task to the column ID of the over column (the column that it is being dragged over)
+        tasks[activeIndex].columnId = over.id;
+        // Move the active task to the same index as it was before (actually, the task is not moved, but it is removed from its current position and re-inserted at the same position which forces a re-render)
         return arrayMove(tasks, activeIndex, activeIndex);
       });
     }
+  }
+
+  function onDragEnd(event: DragEndEvent) {
+    // When the drag ends, reset the active column and task
+    setActiveColumn(null);
+    setActiveTask(null);
+
+    // Get the active item (the item that is being dragged) and the over item (the item that it is being dragged over)
+    const { active, over } = event;
+
+    // If there is no over item (the item that the active item is being dragged over) is not present, do nothing
+    if (!over) return;
+
+    // If both the active item (the item that is being dragged) as well as the over item (the item that it is being dragged over) have the same ID, there has been no position change, so do nothing
+    if (active.id === over.id) return;
+  
+    setColumns((columns) => {
+      // Find the index of the active column (the column that is being dragged) by finding the column with the same ID as the active item (the item that is being dragged)
+      const activeColumnIndex = columns.findIndex((column) => column.id === active.id);
+
+      // Find the index of the over column (the column that is being dragged over) by finding the column with the same ID as the over item (the item that it is being dragged over)
+      const overColumnIndex = columns.findIndex((column) => column.id === over.id);
+
+      // Move the active column (the column that is being dragged) to the index of the over column (the column that is being dragged over)
+      return arrayMove(columns, activeColumnIndex, overColumnIndex);
+    });
   }
 }
 
